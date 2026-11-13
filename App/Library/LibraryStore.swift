@@ -9,6 +9,12 @@ struct PuzzleSummary: Sendable, Hashable {
     var author: String
     var format: PuzzleFormat
     var progress: SolveState.Progress
+    var width: Int
+    var height: Int
+    /// Publication date from the file's date field, title, file name, or copyright line.
+    var published: PuzzleDate?
+
+    var sizeLabel: String { "\(width)×\(height)" }
 }
 
 struct PuzzleItem: Identifiable, Hashable, Sendable {
@@ -17,6 +23,8 @@ struct PuzzleItem: Identifiable, Hashable, Sendable {
     /// Subfolder path relative to the library folder ("" for top level).
     let folder: String
     let modified: Date
+    /// When the file was added; the fallback for puzzles with no publication date.
+    let created: Date
     let isDownloaded: Bool
     var summary: PuzzleSummary?
     var loadError: String?
@@ -122,11 +130,15 @@ final class LibraryStore {
             guard !Task.isCancelled else { return }
             do {
                 let document = try await io.read(item.url)
+                let puzzle = document.puzzle
                 let summary = PuzzleSummary(
-                    title: document.puzzle.metadata.title,
-                    author: document.puzzle.metadata.author,
+                    title: puzzle.metadata.title,
+                    author: puzzle.metadata.author,
                     format: document.format,
-                    progress: document.state.progress(in: document.puzzle)
+                    progress: document.state.progress(in: puzzle),
+                    width: puzzle.width,
+                    height: puzzle.height,
+                    published: PublicationDate.resolve(metadata: puzzle.metadata, fileName: item.fileName)
                 )
                 summaryCache[item.url] = (item.modified, summary)
                 update(item.url) { $0.summary = summary; $0.loadError = nil }
@@ -155,7 +167,7 @@ final class LibraryStore {
     }
 
     nonisolated static func listPuzzles(in folder: URL) -> [PuzzleItem] {
-        let keys: [URLResourceKey] = [.contentModificationDateKey, .isRegularFileKey, .ubiquitousItemDownloadingStatusKey]
+        let keys: [URLResourceKey] = [.contentModificationDateKey, .creationDateKey, .isRegularFileKey, .ubiquitousItemDownloadingStatusKey]
         guard let enumerator = FileManager.default.enumerator(
             at: folder, includingPropertiesForKeys: keys, options: [.skipsPackageDescendants]
         ) else { return [] }
@@ -184,7 +196,9 @@ final class LibraryStore {
             let folderName = parent.hasPrefix(basePath) ? String(parent.dropFirst(basePath.count)).trimmingCharacters(in: CharacterSet(charactersIn: "/")) : ""
             results.append(PuzzleItem(
                 url: target, fileName: name, folder: folderName,
-                modified: values?.contentModificationDate ?? .distantPast, isDownloaded: downloaded
+                modified: values?.contentModificationDate ?? .distantPast,
+                created: values?.creationDate ?? values?.contentModificationDate ?? .distantPast,
+                isDownloaded: downloaded
             ))
         }
         return results

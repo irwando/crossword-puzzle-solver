@@ -59,7 +59,8 @@ enum IPuzReader {
             title: MarkupText.plain(json["title"]?.stringValue ?? ""),
             author: MarkupText.plain(json["author"]?.stringValue ?? ""),
             copyright: MarkupText.plain(json["copyright"]?.stringValue ?? ""),
-            notes: MarkupText.plain(json["notes"]?.stringValue ?? json["intro"]?.stringValue ?? "")
+            notes: MarkupText.plain(json["notes"]?.stringValue ?? json["intro"]?.stringValue ?? ""),
+            date: json["date"]?.stringValue ?? ""
         )
         let puzzle = Puzzle(width: width, height: height, cells: cells, clues: clues, metadata: metadata)
         return (puzzle, state(json: json, puzzle: puzzle, conventions: conventions))

@@ -7,7 +7,6 @@ extension FocusedValues {
 
 /// Menu bar commands (Mac, and iPad with a hardware keyboard).
 struct PuzzleCommands: Commands {
-    let library: LibraryStore
     @FocusedValue(\.puzzleModel) private var model
 
     var body: some Commands {
@@ -47,9 +46,6 @@ struct PuzzleCommands: Commands {
             }
             .disabled(model == nil)
 
-            Divider()
-            Button("Refresh Library") { library.refresh() }
-                .keyboardShortcut("r", modifiers: .command)
         }
     }
 }

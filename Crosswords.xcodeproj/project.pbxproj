@@ -10,7 +10,13 @@
 		102B22ADB6D866AE3BBA19A3 /* CrosswordsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21F929C736242CC3D5C0F240 /* CrosswordsApp.swift */; };
 		147FBF2AA9572A211A61D9EC /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8CC4BEF53E59F1DFFCAAE7 /* Theme.swift */; };
 		19FD1E36EE1C166139D8B817 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCB7B09988A5ECF3E10AC06E /* LibraryView.swift */; };
+		1C8AB661025B0FDEE09BE138 /* WidePuzzleLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C6E6D5B2B75C38DD1B01A4F /* WidePuzzleLayout.swift */; };
+		30DA76FA37AAED911869F971 /* LibraryCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1EBE86D25451E95BDD2310 /* LibraryCommands.swift */; };
+		37D1D22D2A7EBB3BA04B6CA9 /* HighlightStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19724F2673464E96A750DC27 /* HighlightStyle.swift */; };
+		3C811C9507D0DF1D8E283F85 /* LibraryControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98B33F9FC70C16827A733D6C /* LibraryControls.swift */; };
+		5425762434A90EB404627249 /* AppNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8142B76E13B78DCB4410632F /* AppNavigation.swift */; };
 		549C555D24BBC17070836F91 /* PuzzleFormats in Frameworks */ = {isa = PBXBuildFile; productRef = 6B2545354C06A2BCCB00552E /* PuzzleFormats */; };
+		5C0BA3778005DFBBACD3B015 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58AAF9FA4DD8163BAB7CF23D /* SettingsView.swift */; };
 		5D307D045C47CBDD31D87813 /* ClueViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF062169F07D1A3FCCC11502 /* ClueViews.swift */; };
 		636DFFD72B36B9ABAED1E9CB /* FolderBookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D037A2538CB026E8B89E652 /* FolderBookmark.swift */; };
 		66AFF429B037A84D00CCE622 /* PuzzleScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDFA10E1DA7E303CC70F1593 /* PuzzleScreen.swift */; };
@@ -19,9 +25,13 @@
 		9D8CA011731DD7A6F9C9ED5E /* KeyMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD8CE8C7E86A1F9B6196FE08 /* KeyMapper.swift */; };
 		B005830E3C4AF2463212E516 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D0E8977A272D659B44846361 /* Assets.xcassets */; };
 		B0545B92850F8A34E98D3782 /* PuzzleViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96D05DADAD9D23873C3C9DDE /* PuzzleViewModel.swift */; };
+		B33982F3893FE7FF2B9150DD /* LibraryQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06887EB5C426DB936255454 /* LibraryQuery.swift */; };
+		B6FD6244896A9EF0F5E232FC /* HighlightSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A352FFCFB7DAC4D3A95FFA /* HighlightSettingsSection.swift */; };
 		BD88681C6E5E1B083484B19C /* FilePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C99320D9544405194B431DB8 /* FilePresenter.swift */; };
+		C4D3789D379F4F28DE92E534 /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF3540158EC23E14681118C /* Typography.swift */; };
 		E770945A9DE3B11EBA85461D /* PuzzleToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 853C9D3E166D7FD62453F31E /* PuzzleToolbar.swift */; };
 		EADBC6EDE1B81FF64878C978 /* CrosswordKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B005F7823D6BF11B5EB3828C /* CrosswordKeyboard.swift */; };
+		F16CDA7B5E1C5163F040954D /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D088CB61BD91F55E34FEC3 /* AppSettings.swift */; };
 		F50B014933F62266DF83C88A /* CrosswordCore in Frameworks */ = {isa = PBXBuildFile; productRef = E31B3F73A2022E0D49F84AE9 /* CrosswordCore */; };
 		F75959E8E307E4A5CE137261 /* PuzzleFileIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D5BE942101D7B659AE5AFF /* PuzzleFileIO.swift */; };
 		F7D82A2EE90578B376AE2DA3 /* HardwareKeyboardMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E74FA2655AE1DE0555EC683 /* HardwareKeyboardMonitor.swift */; };
@@ -31,23 +41,33 @@
 
 /* Begin PBXFileReference section */
 		12D5BE942101D7B659AE5AFF /* PuzzleFileIO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PuzzleFileIO.swift; sourceTree = "<group>"; };
+		19724F2673464E96A750DC27 /* HighlightStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightStyle.swift; sourceTree = "<group>"; };
 		1D037A2538CB026E8B89E652 /* FolderBookmark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderBookmark.swift; sourceTree = "<group>"; };
 		21F929C736242CC3D5C0F240 /* CrosswordsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrosswordsApp.swift; sourceTree = "<group>"; };
 		2C8CC4BEF53E59F1DFFCAAE7 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		31A352FFCFB7DAC4D3A95FFA /* HighlightSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightSettingsSection.swift; sourceTree = "<group>"; };
 		56457C56FCA124347884EB0B /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		58AAF9FA4DD8163BAB7CF23D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		5A2C7454185912746904ADE0 /* CrosswordKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = CrosswordKit; path = Packages/CrosswordKit; sourceTree = SOURCE_ROOT; };
+		5C6E6D5B2B75C38DD1B01A4F /* WidePuzzleLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidePuzzleLayout.swift; sourceTree = "<group>"; };
 		6389C3B428CCAD9D23FD8AAE /* Crosswords.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Crosswords.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		64156529BCF87E4F922A108D /* Crosswords-macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Crosswords-macOS.entitlements"; sourceTree = "<group>"; };
+		8142B76E13B78DCB4410632F /* AppNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNavigation.swift; sourceTree = "<group>"; };
 		853C9D3E166D7FD62453F31E /* PuzzleToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PuzzleToolbar.swift; sourceTree = "<group>"; };
+		8D1EBE86D25451E95BDD2310 /* LibraryCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryCommands.swift; sourceTree = "<group>"; };
 		8E74FA2655AE1DE0555EC683 /* HardwareKeyboardMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardwareKeyboardMonitor.swift; sourceTree = "<group>"; };
 		8FF6CCF3C4079A34A03AB118 /* LibraryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryStore.swift; sourceTree = "<group>"; };
 		96D05DADAD9D23873C3C9DDE /* PuzzleViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PuzzleViewModel.swift; sourceTree = "<group>"; };
+		98B33F9FC70C16827A733D6C /* LibraryControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryControls.swift; sourceTree = "<group>"; };
 		98BCCDADA42E9BA2067C46C0 /* GridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridView.swift; sourceTree = "<group>"; };
+		9BF3540158EC23E14681118C /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
+		A8D088CB61BD91F55E34FEC3 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		B005F7823D6BF11B5EB3828C /* CrosswordKeyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrosswordKeyboard.swift; sourceTree = "<group>"; };
 		BD8CE8C7E86A1F9B6196FE08 /* KeyMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyMapper.swift; sourceTree = "<group>"; };
 		C99320D9544405194B431DB8 /* FilePresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilePresenter.swift; sourceTree = "<group>"; };
 		CB24BBDC2BED0E6626E8D7EE /* PuzzleCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PuzzleCommands.swift; sourceTree = "<group>"; };
 		CDFA10E1DA7E303CC70F1593 /* PuzzleScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PuzzleScreen.swift; sourceTree = "<group>"; };
+		D06887EB5C426DB936255454 /* LibraryQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryQuery.swift; sourceTree = "<group>"; };
 		D0E8977A272D659B44846361 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FCB7B09988A5ECF3E10AC06E /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
 		FF062169F07D1A3FCCC11502 /* ClueViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClueViews.swift; sourceTree = "<group>"; };
@@ -77,6 +97,9 @@
 		398D9BEFC269D1D87B421F91 /* Library */ = {
 			isa = PBXGroup;
 			children = (
+				8142B76E13B78DCB4410632F /* AppNavigation.swift */,
+				98B33F9FC70C16827A733D6C /* LibraryControls.swift */,
+				D06887EB5C426DB936255454 /* LibraryQuery.swift */,
 				8FF6CCF3C4079A34A03AB118 /* LibraryStore.swift */,
 				FCB7B09988A5ECF3E10AC06E /* LibraryView.swift */,
 				56457C56FCA124347884EB0B /* RootView.swift */,
@@ -87,6 +110,7 @@
 		3A8D7602F8DA5A2F1FB3AC72 /* Commands */ = {
 			isa = PBXGroup;
 			children = (
+				8D1EBE86D25451E95BDD2310 /* LibraryCommands.swift */,
 				CB24BBDC2BED0E6626E8D7EE /* PuzzleCommands.swift */,
 			);
 			path = Commands;
@@ -101,6 +125,7 @@
 				398D9BEFC269D1D87B421F91 /* Library */,
 				B1979951D08ED48704E475D6 /* Puzzle */,
 				D6E240ED3B021300045B8B2A /* Resources */,
+				B8A958843845D102D6C8B5E3 /* Settings */,
 				BBE8D51227307D782B1024A0 /* Storage */,
 				CCB34C02B0D9483F0E9E53E9 /* Theme */,
 			);
@@ -123,8 +148,20 @@
 				CDFA10E1DA7E303CC70F1593 /* PuzzleScreen.swift */,
 				853C9D3E166D7FD62453F31E /* PuzzleToolbar.swift */,
 				96D05DADAD9D23873C3C9DDE /* PuzzleViewModel.swift */,
+				5C6E6D5B2B75C38DD1B01A4F /* WidePuzzleLayout.swift */,
 			);
 			path = Puzzle;
+			sourceTree = "<group>";
+		};
+		B8A958843845D102D6C8B5E3 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				A8D088CB61BD91F55E34FEC3 /* AppSettings.swift */,
+				31A352FFCFB7DAC4D3A95FFA /* HighlightSettingsSection.swift */,
+				58AAF9FA4DD8163BAB7CF23D /* SettingsView.swift */,
+				9BF3540158EC23E14681118C /* Typography.swift */,
+			);
+			path = Settings;
 			sourceTree = "<group>";
 		};
 		BBE8D51227307D782B1024A0 /* Storage */ = {
@@ -140,6 +177,7 @@
 		CCB34C02B0D9483F0E9E53E9 /* Theme */ = {
 			isa = PBXGroup;
 			children = (
+				19724F2673464E96A750DC27 /* HighlightStyle.swift */,
 				2C8CC4BEF53E59F1DFFCAAE7 /* Theme.swift */,
 			);
 			path = Theme;
@@ -250,6 +288,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5425762434A90EB404627249 /* AppNavigation.swift in Sources */,
+				F16CDA7B5E1C5163F040954D /* AppSettings.swift in Sources */,
 				5D307D045C47CBDD31D87813 /* ClueViews.swift in Sources */,
 				EADBC6EDE1B81FF64878C978 /* CrosswordKeyboard.swift in Sources */,
 				102B22ADB6D866AE3BBA19A3 /* CrosswordsApp.swift in Sources */,
@@ -257,7 +297,12 @@
 				636DFFD72B36B9ABAED1E9CB /* FolderBookmark.swift in Sources */,
 				9B88958769B1C738EC5F1D87 /* GridView.swift in Sources */,
 				F7D82A2EE90578B376AE2DA3 /* HardwareKeyboardMonitor.swift in Sources */,
+				B6FD6244896A9EF0F5E232FC /* HighlightSettingsSection.swift in Sources */,
+				37D1D22D2A7EBB3BA04B6CA9 /* HighlightStyle.swift in Sources */,
 				9D8CA011731DD7A6F9C9ED5E /* KeyMapper.swift in Sources */,
+				30DA76FA37AAED911869F971 /* LibraryCommands.swift in Sources */,
+				3C811C9507D0DF1D8E283F85 /* LibraryControls.swift in Sources */,
+				B33982F3893FE7FF2B9150DD /* LibraryQuery.swift in Sources */,
 				F84FAAA7763A1336EE7228CF /* LibraryStore.swift in Sources */,
 				19FD1E36EE1C166139D8B817 /* LibraryView.swift in Sources */,
 				FDC935057CDF2A53A5417205 /* PuzzleCommands.swift in Sources */,
@@ -266,7 +311,10 @@
 				E770945A9DE3B11EBA85461D /* PuzzleToolbar.swift in Sources */,
 				B0545B92850F8A34E98D3782 /* PuzzleViewModel.swift in Sources */,
 				9399BE15073F7E3F68E58D5B /* RootView.swift in Sources */,
+				5C0BA3778005DFBBACD3B015 /* SettingsView.swift in Sources */,
 				147FBF2AA9572A211A61D9EC /* Theme.swift in Sources */,
+				C4D3789D379F4F28DE92E534 /* Typography.swift in Sources */,
+				1C8AB661025B0FDEE09BE138 /* WidePuzzleLayout.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

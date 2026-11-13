@@ -15,16 +15,16 @@ struct PuzzleToolbar: ToolbarContent {
             Button {
                 model.togglePencil()
             } label: {
-                Label("Pencil", systemImage: model.pencilOn ? "pencil.circle.fill" : "pencil.circle")
+                Label("Pencil", systemImage: model.pencilOn ? "pencil.circle.fill" : "pencil")
             }
-            .help("Pencil mode: enter tentative letters")
+            .help(model.pencilOn ? "Pencil mode is on: letters are tentative (⇧⌘P)" : "Pencil mode: enter tentative letters (⇧⌘P)")
 
             Button {
                 model.perform(.toggleRebus)
             } label: {
                 Label("Rebus", systemImage: "character.textbox")
             }
-            .help("Enter several letters in one square (Esc)")
+            .help("Rebus: enter several letters in one square (Esc)")
 
             Menu {
                 ForEach(AssistScope.allCases, id: \.self) { scope in
@@ -34,7 +34,7 @@ struct PuzzleToolbar: ToolbarContent {
                 Label("Check", systemImage: "checkmark.circle")
             }
             .disabled(!model.canCheck)
-            .help(model.canCheck ? "Check entries" : "This puzzle has no answers to check against")
+            .help(model.canCheck ? "Check square, word, or puzzle (⌥⌘1 / 2 / 3)" : "This puzzle has no answers to check against")
 
             Menu {
                 Button("Reveal Square") { model.perform(.reveal(.square)) }
@@ -44,6 +44,7 @@ struct PuzzleToolbar: ToolbarContent {
                 Label("Reveal", systemImage: "eye")
             }
             .disabled(!model.canCheck)
+            .help(model.canCheck ? "Reveal square, word, or puzzle (⌃⌥⌘1 / 2 / 3)" : "This puzzle has no answers to reveal")
 
             Menu {
                 Button("Clear Word", systemImage: "eraser") { model.perform(.clear(.word)) }
@@ -58,9 +59,11 @@ struct PuzzleToolbar: ToolbarContent {
                 #endif
                 Divider()
                 Button("Puzzle Info", systemImage: "info.circle") { showingInfo = true }
+                SettingsButton()
             } label: {
                 Label("More", systemImage: "ellipsis.circle")
             }
+            .help("Clear, reset, puzzle info, and settings")
             .popover(isPresented: $showingInfo) {
                 if let puzzle = model.session?.puzzle {
                     PuzzleInfoView(metadata: puzzle.metadata, format: model.format?.displayName ?? "", canCheck: model.canCheck)
@@ -109,15 +112,16 @@ private struct PuzzleInfoView: View {
     let metadata: PuzzleMetadata
     let format: String
     let canCheck: Bool
+    @Environment(\.typography) private var typography
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(metadata.title.nonEmpty ?? "Untitled").font(Theme.titleFont)
+            Text(metadata.title.nonEmpty ?? "Untitled").font(typography.heading)
             if !metadata.author.isEmpty { Text("By \(metadata.author)").font(.headline) }
             if !metadata.copyright.isEmpty { Text(metadata.copyright).font(.caption).foregroundStyle(.secondary) }
             if !metadata.notes.isEmpty {
                 Divider()
-                Text(metadata.notes).font(Theme.clueFont)
+                Text(metadata.notes).font(typography.clue)
             }
             Divider()
             Text("\(format) file").font(.caption).foregroundStyle(.secondary)

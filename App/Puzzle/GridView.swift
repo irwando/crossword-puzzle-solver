@@ -33,12 +33,13 @@ struct GridLayout {
 struct GridView: View {
     let session: SolveSession
     let onSelect: (Int) -> Void
+    @Environment(\.highlightStyle) private var highlight
 
     var body: some View {
         GeometryReader { proxy in
             let layout = GridLayout(available: proxy.size, columns: session.puzzle.width, rows: session.puzzle.height)
             Canvas(rendersAsynchronously: false) { context, _ in
-                GridRenderer(session: session, layout: layout).draw(in: &context)
+                GridRenderer(session: session, layout: layout, highlight: highlight).draw(in: &context)
             }
             .frame(width: layout.size.width, height: layout.size.height)
             .contentShape(Rectangle())
@@ -69,6 +70,7 @@ struct GridView: View {
 private struct GridRenderer {
     let session: SolveSession
     let layout: GridLayout
+    let highlight: HighlightStyle
 
     private var puzzle: Puzzle { session.puzzle }
 
@@ -93,11 +95,11 @@ private struct GridRenderer {
         case .open: break
         }
         if index == session.cursor.cell {
-            return session.rebusBuffer == nil ? Theme.cursor : Theme.rebusCursor
+            return session.rebusBuffer == nil ? highlight.squareColor : highlight.rebusColor
         }
-        if word.contains(index) { return Theme.wordHighlight }
+        if let color = highlight.wordColor, word.contains(index) { return color }
         if cell.isShaded { return Theme.shaded }
-        if crossing.contains(index) { return Theme.crossHighlight }
+        if let color = highlight.crossingColor, crossing.contains(index) { return color }
         return Theme.cell
     }
 

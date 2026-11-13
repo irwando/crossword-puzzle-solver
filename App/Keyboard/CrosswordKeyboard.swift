@@ -23,10 +23,12 @@ struct CrosswordKeyboard: View {
                     } label: {
                         Text(rebusActive ? "Done" : "Rebus").font(.system(.callout, design: .rounded).weight(.semibold))
                     }
+                    .help(rebusActive ? "Finish the rebus entry" : "Enter several letters in one square")
                     ForEach(Array(Self.rows[2]), id: \.self) { letter in letterKey(letter, unit: unit) }
                     KeyButton(style: .function, width: unit * 1.5) { perform(.backspace) } label: {
                         Image(systemName: "delete.left")
                     }
+                    .help("Delete")
                     .accessibilityLabel("Delete")
                 }
                 HStack(spacing: spacing) {
@@ -34,17 +36,21 @@ struct CrosswordKeyboard: View {
                         Label("Pencil", systemImage: pencilOn ? "pencil.circle.fill" : "pencil")
                             .font(.system(.callout, design: .rounded).weight(.semibold))
                     }
+                    .help("Pencil mode: enter tentative letters")
                     KeyButton(style: .function, width: unit * 1.5) { perform(.previousClue) } label: {
                         Image(systemName: "chevron.left.2")
                     }
+                    .help("Previous clue")
                     .accessibilityLabel("Previous clue")
                     KeyButton(style: .function, width: unit * 3) { perform(.toggleDirection) } label: {
                         Label("Across / Down", systemImage: "arrow.up.and.down.and.arrow.left.and.right")
                             .font(.system(.callout, design: .rounded).weight(.semibold))
                     }
+                    .help("Switch between Across and Down")
                     KeyButton(style: .function, width: unit * 1.5) { perform(.nextClue) } label: {
                         Image(systemName: "chevron.right.2")
                     }
+                    .help("Next clue")
                     .accessibilityLabel("Next clue")
                 }
             }

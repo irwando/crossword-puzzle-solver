@@ -5,10 +5,12 @@ import SwiftUI
 struct ClueBar: View {
     let session: SolveSession
     let perform: (SolveAction) -> Void
+    @Environment(\.typography) private var typography
+    @Environment(\.highlightStyle) private var highlight
 
     var body: some View {
         HStack(spacing: 4) {
-            stepButton("chevron.left", label: "Previous clue") { perform(.previousClue) }
+            stepButton("chevron.left", label: "Previous clue", help: "Previous clue (Shift-Tab)") { perform(.previousClue) }
             Button { perform(.toggleDirection) } label: {
                 HStack(alignment: .firstTextBaseline, spacing: 10) {
                     if let clue = session.currentClue {
@@ -16,32 +18,34 @@ struct ClueBar: View {
                             .font(Theme.labelFont)
                             .padding(.horizontal, 7)
                             .padding(.vertical, 2)
-                            .background(Theme.cursor, in: .rect(cornerRadius: 5))
+                            .background(highlight.squareColor, in: .rect(cornerRadius: 5))
                             .foregroundStyle(Theme.ink)
                         Text(clue.text)
-                            .font(Theme.clueBarFont)
+                            .font(typography.clueBar)
                             .foregroundStyle(Theme.ink)
                             .lineLimit(3)
                             .minimumScaleFactor(0.75)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     } else {
-                        Text(" ").font(Theme.clueBarFont).frame(maxWidth: .infinity)
+                        Text(" ").font(typography.clueBar).frame(maxWidth: .infinity)
                     }
                 }
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .help("Switch between Across and Down (Space)")
             .accessibilityHint("Switches between across and down")
             if let rebus = session.rebusBuffer {
                 Text("REBUS: \(rebus.isEmpty ? "…" : rebus)")
                     .font(.system(.caption, design: .monospaced).weight(.bold))
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .background(Theme.rebusCursor, in: .capsule)
+                    .background(highlight.rebusColor, in: .capsule)
                     .foregroundStyle(.black)
                     .transition(.scale.combined(with: .opacity))
+                    .help("Rebus entry: type several letters, then press Return")
             }
-            stepButton("chevron.right", label: "Next clue") { perform(.nextClue) }
+            stepButton("chevron.right", label: "Next clue", help: "Next clue (Tab)") { perform(.nextClue) }
         }
         .padding(.horizontal, 6)
         .padding(.vertical, 10)
@@ -51,7 +55,7 @@ struct ClueBar: View {
         .animation(.snappy(duration: 0.2), value: session.rebusBuffer != nil)
     }
 
-    private func stepButton(_ symbol: String, label: String, action: @escaping () -> Void) -> some View {
+    private func stepButton(_ symbol: String, label: String, help: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: symbol)
                 .font(.title3.weight(.semibold))
@@ -60,6 +64,7 @@ struct ClueBar: View {
         }
         .buttonStyle(.plain)
         .foregroundStyle(Theme.mutedInk)
+        .help(help)
         .accessibilityLabel(label)
     }
 }
@@ -122,14 +127,16 @@ private struct ClueRow: View {
     let clue: Clue
     let emphasis: Emphasis
     let isComplete: Bool
+    @Environment(\.typography) private var typography
+    @Environment(\.highlightStyle) private var highlight
 
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 10) {
             Text(clue.label)
-                .font(.system(.subheadline, design: .rounded).weight(.bold))
-                .frame(minWidth: 26, alignment: .trailing)
+                .font(typography.clueNumber)
+                .frame(minWidth: typography.clueSize * 1.8, alignment: .trailing)
             Text(clue.text)
-                .font(Theme.clueFont)
+                .font(typography.clue)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .foregroundStyle(isComplete && emphasis == .none ? Theme.mutedInk : Theme.ink)
@@ -148,8 +155,8 @@ private struct ClueRow: View {
 
     private var background: Color {
         switch emphasis {
-        case .primary: Theme.wordHighlight
-        case .secondary: Theme.crossHighlight
+        case .primary: highlight.wordColor ?? .clear
+        case .secondary: highlight.crossingColor ?? .clear
         case .none: .clear
         }
     }

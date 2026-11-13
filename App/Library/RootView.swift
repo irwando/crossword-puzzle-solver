@@ -3,13 +3,14 @@ import UniformTypeIdentifiers
 
 struct RootView: View {
     @Environment(LibraryStore.self) private var library
+    @Environment(AppNavigation.self) private var navigation
     @State private var selection: URL?
     @State private var columnVisibility: NavigationSplitViewVisibility = .automatic
-    @State private var showingFolderPicker = false
 
     var body: some View {
+        @Bindable var navigation = navigation
         NavigationSplitView(columnVisibility: $columnVisibility) {
-            LibraryView(selection: $selection, showingFolderPicker: $showingFolderPicker)
+            LibraryView(selection: $selection)
                 .navigationSplitViewColumnWidth(min: 260, ideal: 300, max: 380)
         } detail: {
             if let selection {
@@ -26,7 +27,7 @@ struct RootView: View {
                 .background(Theme.paper)
             }
         }
-        .fileImporter(isPresented: $showingFolderPicker, allowedContentTypes: [.folder]) { result in
+        .fileImporter(isPresented: $navigation.showingFolderPicker, allowedContentTypes: [.folder]) { result in
             switch result {
             case .success(let url):
                 selection = nil
@@ -35,6 +36,22 @@ struct RootView: View {
                 library.errorMessage = error.localizedDescription
             }
         }
+        #if os(iOS)
+        .environment(\.openAppSettings, OpenAppSettingsAction { [navigation] in navigation.showingSettings = true })
+        .sheet(isPresented: $navigation.showingSettings) {
+            NavigationStack {
+                SettingsView()
+                    .navigationTitle("Settings")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Done") { navigation.showingSettings = false }
+                        }
+                    }
+            }
+            .appSettings()
+        }
+        #endif
         .alert("Something went wrong", isPresented: errorBinding) {
             Button("OK") { library.errorMessage = nil }
         } message: {
@@ -46,8 +63,12 @@ struct RootView: View {
             if let name = UserDefaults.standard.string(forKey: "CrosswordsAutoOpen"), let folder = library.folderURL {
                 selection = folder.appendingPathComponent(name)
             }
+            if UserDefaults.standard.bool(forKey: "CrosswordsShowSettings") { navigation.showingSettings = true }
         }
         #endif
+        .onChange(of: library.folderURL) { _, folder in
+            if folder == nil { selection = nil }
+        }
         #if os(iOS)
         .onChange(of: selection) { _, newValue in
             if newValue != nil {

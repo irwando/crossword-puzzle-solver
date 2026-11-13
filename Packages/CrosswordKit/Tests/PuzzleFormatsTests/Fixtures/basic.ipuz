@@ -4,6 +4,7 @@
   "title": "Ipuz <i>Test</i>",
   "author": "Tester",
   "copyright": "2026",
+  "date": "11/09/2026",
   "dimensions": {"width": 4, "height": 3},
   "puzzle": [
     [{"cell": 1, "style": {"shapebg": "circle"}}, 0, 2, null],

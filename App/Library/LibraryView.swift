@@ -1,26 +1,17 @@
 import SwiftUI
 
-enum LibrarySort: String, CaseIterable, Identifiable {
-    case newest
-    case title
-    case progress
-
-    var id: String { rawValue }
-    var label: String {
-        switch self {
-        case .newest: "Newest First"
-        case .title: "Title"
-        case .progress: "In Progress First"
-        }
-    }
-}
-
 struct LibraryView: View {
     @Environment(LibraryStore.self) private var library
+    @Environment(AppNavigation.self) private var navigation
     @Binding var selection: URL?
-    @Binding var showingFolderPicker: Bool
-    @AppStorage(SettingsKey.librarySort) private var sort: LibrarySort = .newest
+    @AppStorage(SettingsKey.librarySort) private var sort: LibrarySort = .newestPublished
+    @AppStorage(SettingsKey.libraryStatusFilter) private var statusFilter: StatusFilter = .all
+    @AppStorage(SettingsKey.librarySizeFilter) private var sizeFilter = ""
     @State private var searchText = ""
+
+    private var query: LibraryQuery {
+        LibraryQuery(search: searchText, sort: sort, status: statusFilter, size: sizeFilter)
+    }
 
     var body: some View {
         Group {
@@ -37,7 +28,6 @@ struct LibraryView: View {
             }
         }
         .navigationTitle(library.folderURL?.lastPathComponent ?? "Crosswords")
-        .toolbar { toolbarContent }
     }
 
     private var chooseFolderPrompt: some View {
@@ -46,13 +36,23 @@ struct LibraryView: View {
         } description: {
             Text("Pick a folder in iCloud Drive. Your progress is saved into the puzzle files, so it follows you to every device that uses the same folder.")
         } actions: {
-            Button("Choose Folder…") { showingFolderPicker = true }
+            Button("Choose Folder…") { navigation.showingFolderPicker = true }
                 .buttonStyle(.borderedProminent)
         }
     }
 
     private var puzzleList: some View {
         List(selection: $selection) {
+            if filteredItems.isEmpty && query.isFiltering {
+                ContentUnavailableView {
+                    Label("No Matching Puzzles", systemImage: "line.3.horizontal.decrease.circle")
+                } description: {
+                    Text("No puzzles match \(filterSummary).")
+                } actions: {
+                    Button("Clear Filters", action: clearFilters)
+                }
+                .listRowSeparator(.hidden)
+            }
             ForEach(groupedItems, id: \.folder) { group in
                 Section(group.folder.isEmpty ? "Puzzles" : group.folder) {
                     ForEach(group.items) { item in
@@ -62,7 +62,13 @@ struct LibraryView: View {
                 }
             }
         }
-        .searchable(text: $searchText, prompt: "Search titles and authors")
+        .safeAreaInset(edge: .top, spacing: 0) {
+            LibraryControls(
+                status: $statusFilter, size: $sizeFilter, sort: $sort,
+                sizes: LibraryQuery.sizes(in: library.items)
+            )
+        }
+        .searchable(text: $searchText, placement: .sidebar, prompt: "Search titles and authors")
         .refreshable { library.refresh() }
         .overlay(alignment: .bottom) {
             if library.isRefreshing {
@@ -71,53 +77,15 @@ struct LibraryView: View {
         }
     }
 
-    @ToolbarContentBuilder
-    private var toolbarContent: some ToolbarContent {
-        ToolbarItem {
-            Menu {
-                Picker("Sort", selection: $sort) {
-                    ForEach(LibrarySort.allCases) { Text($0.label).tag($0) }
-                }
-                Divider()
-                Button("Refresh", systemImage: "arrow.clockwise") { library.refresh() }
-                    .disabled(library.folderURL == nil)
-                Button("Choose Folder…", systemImage: "folder") { showingFolderPicker = true }
-                if library.folderURL != nil {
-                    Button("Forget Folder", systemImage: "folder.badge.minus", role: .destructive) {
-                        selection = nil
-                        library.forgetFolder()
-                    }
-                }
-            } label: {
-                Label("Library Options", systemImage: "ellipsis.circle")
-            }
-        }
+    private var filteredItems: [PuzzleItem] { query.apply(to: library.items) }
+
+    private func clearFilters() {
+        statusFilter = .all
+        sizeFilter = ""
     }
 
-    private var filteredItems: [PuzzleItem] {
-        let query = searchText.trimmingCharacters(in: .whitespaces).lowercased()
-        let matching = query.isEmpty ? library.items : library.items.filter { item in
-            item.displayTitle.lowercased().contains(query)
-                || (item.summary?.author.lowercased().contains(query) ?? false)
-                || item.fileName.lowercased().contains(query)
-        }
-        return matching.sorted(by: sortOrder)
-    }
-
-    private func sortOrder(_ a: PuzzleItem, _ b: PuzzleItem) -> Bool {
-        switch sort {
-        case .newest:
-            return a.modified > b.modified
-        case .title:
-            return a.displayTitle.localizedStandardCompare(b.displayTitle) == .orderedAscending
-        case .progress:
-            let rank = { (item: PuzzleItem) -> Int in
-                guard let progress = item.summary?.progress else { return 2 }
-                if progress.isSolved { return 3 }
-                return progress.filled > 0 ? 0 : 1
-            }
-            return rank(a) == rank(b) ? a.modified > b.modified : rank(a) < rank(b)
-        }
+    private var filterSummary: String {
+        LibraryControls.filterSummary(status: statusFilter, size: sizeFilter) ?? ""
     }
 
     private var groupedItems: [(folder: String, items: [PuzzleItem])] {
@@ -130,12 +98,13 @@ struct LibraryView: View {
 
 struct PuzzleRow: View {
     let item: PuzzleItem
+    @Environment(\.typography) private var typography
 
     var body: some View {
         HStack(alignment: .center, spacing: 12) {
             VStack(alignment: .leading, spacing: 3) {
                 Text(item.displayTitle)
-                    .font(.system(.body, design: .serif).weight(.semibold))
+                    .font(typography.listTitle)
                     .lineLimit(2)
                 Text(subtitle)
                     .font(.caption)
@@ -151,8 +120,10 @@ struct PuzzleRow: View {
 
     private var subtitle: String {
         if let error = item.loadError { return error }
-        let parts = [item.summary?.author, item.summary?.format.displayName].compactMap { $0 }.filter { !$0.isEmpty }
-        return parts.isEmpty ? item.fileName : parts.joined(separator: " · ")
+        guard let summary = item.summary else { return item.fileName }
+        let published = summary.published?.date?.formatted(date: .abbreviated, time: .omitted)
+        let parts = [summary.author, published, summary.sizeLabel].compactMap { $0 }.filter { !$0.isEmpty }
+        return parts.joined(separator: " · ")
     }
 
     @ViewBuilder

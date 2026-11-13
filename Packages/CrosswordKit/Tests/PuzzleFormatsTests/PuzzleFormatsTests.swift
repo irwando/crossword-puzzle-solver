@@ -101,6 +101,7 @@ struct IPuzTests {
         let puzzle = doc.puzzle
         #expect(doc.format == .ipuz)
         #expect(puzzle.metadata.title == "Ipuz Test")
+        #expect(puzzle.metadata.date == "11/09/2026")
         #expect(puzzle.cells[3].kind == .void)
         #expect(puzzle.cells[5].kind == .block)
         #expect(puzzle.cells[0].isCircled)

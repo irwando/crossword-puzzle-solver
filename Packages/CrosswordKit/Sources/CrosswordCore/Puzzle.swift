@@ -78,12 +78,15 @@ public struct PuzzleMetadata: Sendable, Hashable {
     public var author: String
     public var copyright: String
     public var notes: String
+    /// Publication date as written in the file (only .ipuz has a dedicated field).
+    public var date: String
 
-    public init(title: String = "", author: String = "", copyright: String = "", notes: String = "") {
+    public init(title: String = "", author: String = "", copyright: String = "", notes: String = "", date: String = "") {
         self.title = title
         self.author = author
         self.copyright = copyright
         self.notes = notes
+        self.date = date
     }
 }
 

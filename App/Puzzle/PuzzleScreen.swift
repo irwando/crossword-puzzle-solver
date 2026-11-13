@@ -10,6 +10,8 @@ struct PuzzleScreen: View {
     @Environment(LibraryStore.self) private var library
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage(SettingsKey.skipFilledSquares) private var skipFilled = true
+    @AppStorage(SettingsKey.acrossCluesSide) private var acrossSide: ClueSide = .right
+    @AppStorage(SettingsKey.downCluesSide) private var downSide: ClueSide = .right
     @State private var model: PuzzleViewModel
     @State private var hardwareKeyboard = HardwareKeyboardMonitor()
     @State private var keyboardPreference: Bool? = {
@@ -40,6 +42,7 @@ struct PuzzleScreen: View {
             }
             .task {
                 let url = url
+                let library = library
                 model.onProgressChange = { [weak library] progress in
                     library?.updateProgress(for: url, progress: progress)
                 }
@@ -137,17 +140,14 @@ struct PuzzleScreen: View {
     }
 
     private func wideLayout(_ session: SolveSession, size: CGSize) -> some View {
-        HStack(alignment: .top, spacing: 20) {
-            VStack(spacing: 12) {
-                ClueBar(session: session, perform: model.perform)
-                grid(session)
-            }
-            .frame(maxWidth: .infinity)
-            HStack(alignment: .top, spacing: 8) {
-                ClueListView(direction: .across, session: session, perform: model.perform)
-                ClueListView(direction: .down, session: session, perform: model.perform)
-            }
-            .frame(width: min(560, max(320, size.width * 0.38)))
+        WidePuzzleLayout(
+            session: session,
+            size: CGSize(width: size.width - 32, height: size.height - 28),
+            acrossSide: acrossSide,
+            downSide: downSide,
+            perform: model.perform
+        ) {
+            grid(session)
         }
     }
 
