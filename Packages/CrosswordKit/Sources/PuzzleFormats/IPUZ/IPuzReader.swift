@@ -39,7 +39,7 @@ enum IPuzReader {
         }
         guard let width = json["dimensions"]?["width"]?.intValue,
               let height = json["dimensions"]?["height"]?.intValue,
-              width > 0, height > 0, width * height <= 10_000,
+              GridLimits.isValid(width: width, height: height, maxCells: 10_000),
               let rows = json["puzzle"]?.arrayValue, rows.count >= height
         else { throw .malformed("missing dimensions or grid") }
 
@@ -60,7 +60,7 @@ enum IPuzReader {
             author: MarkupText.plain(json["author"]?.stringValue ?? ""),
             copyright: MarkupText.plain(json["copyright"]?.stringValue ?? ""),
             notes: MarkupText.plain(json["notes"]?.stringValue ?? json["intro"]?.stringValue ?? ""),
-            date: json["date"]?.stringValue ?? ""
+            date: TextLimits.clean(json["date"]?.stringValue ?? "", maxLength: 64)
         )
         let puzzle = Puzzle(width: width, height: height, cells: cells, clues: clues, metadata: metadata)
         return (puzzle, state(json: json, puzzle: puzzle, conventions: conventions))
@@ -83,7 +83,7 @@ enum IPuzReader {
             cell.number = number
         }
         if let solution, let text = solutionText(solution), text != conventions.empty {
-            cell.solution = text.uppercased()
+            cell.solution = TextLimits.entry(text)
         }
         if let style {
             cell.isCircled = style["shapebg"]?.stringValue?.lowercased() == "circle"
@@ -128,7 +128,8 @@ enum IPuzReader {
             guard let key = groups.keys.first(where: { $0.lowercased().hasPrefix(direction.rawValue) }),
                   let items = groups[key]?.arrayValue else { continue }
             for (position, item) in items.enumerated() {
-                let (label, text, explicitCells) = clueParts(item)
+                let (rawLabel, text, explicitCells) = clueParts(item)
+                let label = rawLabel.map(TextLimits.label)
                 let number = label.flatMap { Int($0.split(separator: "/").first ?? "") } ?? position + 1
                 let cellList: [Int]
                 if let explicitCells {
@@ -169,7 +170,7 @@ enum IPuzReader {
             var entry = saved.flatMap { solutionText($0[i]) } ?? ""
             if entry == conventions.empty || entry == conventions.block { entry = "" }
             let rawMarks = marks?[i].intValue.map { CellMarks(rawValue: UInt8(clamping: $0)) } ?? []
-            return CellState(entry: entry.uppercased(), marks: rawMarks)
+            return CellState(entry: TextLimits.entry(entry), marks: rawMarks)
         }
         return SolveState(cells: cells)
     }

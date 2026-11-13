@@ -2,7 +2,9 @@ import CrosswordCore
 import SwiftUI
 import os
 
+#if DEBUG
 private let keyLog = Logger(subsystem: "com.irwando.crosswords", category: "keys")
+#endif
 
 struct PuzzleScreen: View {
     let url: URL
@@ -132,7 +134,9 @@ struct PuzzleScreen: View {
         .onKeyPress(phases: [.down, .repeat]) { press in
             // Read live state: the `session` captured by this closure can be a render behind.
             let action = KeyMapper.action(for: press, rebusActive: model.session?.rebusBuffer != nil)
+            #if DEBUG
             keyLog.debug("key \(press.characters.debugDescription, privacy: .public) → \(String(describing: action), privacy: .public)")
+            #endif
             guard let action else { return .ignored }
             model.perform(action)
             return .handled

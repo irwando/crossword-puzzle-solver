@@ -28,7 +28,7 @@ actor PuzzleFileIO {
     func takeConflictStates(_ url: URL) -> [SolveState] {
         guard let versions = NSFileVersion.unresolvedConflictVersionsOfItem(at: url), !versions.isEmpty else { return [] }
         let states = versions.compactMap { version -> SolveState? in
-            guard let data = try? Data(contentsOf: version.url) else { return nil }
+            guard let data = try? Self.boundedData(at: version.url) else { return nil }
             return try? PuzzleCodec.decode(data).state
         }
         for version in versions { version.isResolved = true }
@@ -42,10 +42,18 @@ actor PuzzleFileIO {
         NSFileCoordinator(filePresenter: presenter).coordinate(
             readingItemAt: url, options: [], error: &coordinationError
         ) { target in
-            result = Result { try Data(contentsOf: target) }
+            result = Result { try Self.boundedData(at: target) }
         }
         if let coordinationError { throw coordinationError }
         return try result.get()
+    }
+
+    /// Reads a file only if it's small enough to be a puzzle, so a huge or hostile file is never
+    /// loaded into memory.
+    private static func boundedData(at url: URL) throws -> Data {
+        let size = try url.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
+        guard size <= PuzzleCodec.maxFileSize else { throw PuzzleFormatError.tooLarge }
+        return try Data(contentsOf: url)
     }
 }
 

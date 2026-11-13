@@ -21,12 +21,14 @@ public enum PuzzleFormatError: Error, Sendable, Equatable, LocalizedError {
     case unrecognizedFormat
     case malformed(String)
     case unsupported(String)
+    case tooLarge
 
     public var errorDescription: String? {
         switch self {
         case .unrecognizedFormat: "This file isn't a .puz, .ipuz, or .jpz crossword."
         case .malformed(let detail): "The puzzle file is damaged: \(detail)"
         case .unsupported(let detail): "This puzzle type isn't supported: \(detail)"
+        case .tooLarge: "This file is too large to be a crossword puzzle."
         }
     }
 }
@@ -69,8 +71,14 @@ public struct PuzzleDocument: Sendable {
 }
 
 public enum PuzzleCodec {
+    /// Real puzzle files are a few KB; anything this large is rejected before parsing.
+    public static let maxFileSize = 8 * 1024 * 1024
+    /// Largest .jpz entry we will inflate from a zip archive.
+    public static let maxUncompressedSize = 16 * 1024 * 1024
+
     public static func decode(_ data: Data) throws(PuzzleFormatError) -> PuzzleDocument {
-        switch sniff(data) {
+        guard data.count <= maxFileSize else { throw .tooLarge }
+        return switch sniff(data) {
         case .puz: try PuzReader.read(data)
         case .ipuz: try IPuzReader.read(data)
         case .jpz: try JPZReader.read(data)

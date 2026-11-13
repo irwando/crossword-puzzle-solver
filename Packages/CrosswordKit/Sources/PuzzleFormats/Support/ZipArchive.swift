@@ -1,3 +1,4 @@
+import Compression
 import Foundation
 
 /// Just enough ZIP support for single-file .jpz archives.
@@ -40,8 +41,11 @@ enum ZipArchive {
             let localNameLength = Int(try local.uint16())
             let localExtraLength = Int(try local.uint16())
             _ = try local.read(localNameLength + localExtraLength)
+            guard compressedSize <= PuzzleCodec.maxFileSize, uncompressedSize <= PuzzleCodec.maxUncompressedSize else {
+                throw .tooLarge
+            }
             let payload = Data(try local.read(compressedSize))
-            return Entry(name: name, data: try decompress(payload, method: method, expectedSize: uncompressedSize))
+            return Entry(name: name, data: try decompress(payload, method: method))
         }
         throw .malformed("zip archive is empty")
     }
@@ -56,19 +60,39 @@ enum ZipArchive {
         return nil
     }
 
-    private static func decompress(_ data: Data, method: UInt16, expectedSize: Int) throws(PuzzleFormatError) -> Data {
+    private static func decompress(_ data: Data, method: UInt16) throws(PuzzleFormatError) -> Data {
         switch method {
         case 0:
             return data
         case 8:
-            // Apple's "zlib" algorithm is raw DEFLATE, which is what ZIP stores.
-            guard let inflated = try? (data as NSData).decompressed(using: .zlib) as Data else {
-                throw .malformed("could not inflate zip entry")
-            }
-            return inflated
+            return try inflate(data, limit: PuzzleCodec.maxUncompressedSize)
         default:
             throw .unsupported("zip compression method \(method)")
         }
+    }
+
+    /// Streams raw DEFLATE (Apple's "zlib" algorithm) and stops once the output passes `limit`, so a
+    /// zip bomb can't exhaust memory no matter what sizes its headers claim.
+    static func inflate(_ data: Data, limit: Int) throws(PuzzleFormatError) -> Data {
+        var output = Data()
+        do {
+            var offset = 0
+            let filter = try InputFilter(.decompress, using: .zlib) { (length: Int) -> Data? in
+                let end = min(offset + length, data.count)
+                defer { offset = end }
+                return offset < end ? data.subdata(in: offset..<end) : nil
+            }
+            while let page = try filter.readData(ofLength: 64 * 1024) {
+                output.append(page)
+                if output.count > limit { throw PuzzleFormatError.tooLarge }
+            }
+        } catch let error as PuzzleFormatError {
+            throw error
+        } catch {
+            throw .malformed("could not inflate zip entry")
+        }
+        guard !output.isEmpty || data.isEmpty else { throw .malformed("could not inflate zip entry") }
+        return output
     }
 
     /// Writes a single uncompressed entry.

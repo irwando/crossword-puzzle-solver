@@ -33,7 +33,7 @@ enum JPZReader {
         guard let gridElement = crossword.child("grid"),
               let width = gridElement.attributes["width"].flatMap(Int.init),
               let height = gridElement.attributes["height"].flatMap(Int.init),
-              width > 0, height > 0, width * height <= 10_000
+              GridLimits.isValid(width: width, height: height, maxCells: 10_000)
         else { throw .malformed("missing grid size") }
 
         var cells = [PuzzleCell](repeating: .block, count: width * height)
@@ -66,7 +66,7 @@ enum JPZReader {
         let background = element.attributes["background-color"]?.lowercased()
         return PuzzleCell(
             kind: .open,
-            solution: element.attributes["solution"].flatMap { $0.isEmpty ? nil : $0.uppercased() },
+            solution: element.attributes["solution"].flatMap { $0.isEmpty ? nil : TextLimits.entry($0) },
             number: element.attributes["number"].flatMap(Int.init),
             isCircled: element.attributes["background-shape"] == "circle",
             isShaded: background != nil && background != "#ffffff" && background != "white"
@@ -78,7 +78,7 @@ enum JPZReader {
             .flatMap(UInt8.init)
             .map(CellMarks.init(rawValue:)) ?? []
         if element.attributes["solve-status"] == "revealed" { marks.insert(.revealed) }
-        let entry = element.attributes["solve-state"]?.trimmingCharacters(in: .whitespaces).uppercased() ?? ""
+        let entry = TextLimits.entry(element.attributes["solve-state"]?.trimmingCharacters(in: .whitespaces) ?? "")
         return CellState(entry: entry, marks: marks)
     }
 
@@ -98,7 +98,7 @@ enum JPZReader {
         for word in crossword.children("word") {
             guard let id = word.attributes["id"] else { continue }
             var cells = cellRange(x: word.attributes["x"], y: word.attributes["y"], width: width, height: height)
-            for part in word.children("cells") {
+            for part in word.children("cells") where cells.count <= width * height {
                 cells += cellRange(x: part.attributes["x"], y: part.attributes["y"], width: width, height: height)
             }
             words[id] = cells
@@ -106,22 +106,26 @@ enum JPZReader {
         return words
     }
 
-    /// Expands `x="1-5" y="2"` style ranges (1-based, inclusive, possibly descending).
+    /// Expands `x="1-5" y="2"` style ranges (1-based, inclusive, possibly descending), clipped to the grid.
     static func cellRange(x: String?, y: String?, width: Int, height: Int) -> [Int] {
-        guard let xs = span(x), let ys = span(y) else { return [] }
-        return ys.flatMap { row in xs.map { column in (row, column) } }
-            .filter { (1...height).contains($0.0) && (1...width).contains($0.1) }
-            .map { ($0.0 - 1) * width + ($0.1 - 1) }
+        guard let xs = span(x, upTo: width), let ys = span(y, upTo: height) else { return [] }
+        return ys.flatMap { row in xs.map { column in (row - 1) * width + (column - 1) } }
     }
 
-    private static func span(_ value: String?) -> [Int]? {
+    /// Positions in a "3" or "1-5" span that fall within 1...limit. Clipping happens before the range
+    /// is built, so a span like "1-9223372036854775807" stays small.
+    private static func span(_ value: String?, upTo limit: Int) -> [Int]? {
         guard let value else { return nil }
         let bounds = value.split(separator: "-").compactMap { Int($0.trimmingCharacters(in: .whitespaces)) }
+        let first: Int, last: Int
         switch bounds.count {
-        case 1: return bounds
-        case 2: return bounds[0] <= bounds[1] ? Array(bounds[0]...bounds[1]) : Array((bounds[1]...bounds[0]).reversed())
+        case 1: (first, last) = (bounds[0], bounds[0])
+        case 2: (first, last) = (bounds[0], bounds[1])
         default: return nil
         }
+        let low = max(1, min(first, last)), high = min(limit, max(first, last))
+        guard low <= high else { return [] }
+        return first <= last ? Array(low...high) : Array((low...high).reversed())
     }
 
     private static func parseClues(
@@ -138,7 +142,7 @@ enum JPZReader {
             let title = group.child("title")?.text.lowercased() ?? ""
             let direction: Direction = title.contains("down") ? .down : title.contains("across") ? .across : (position == 0 ? .across : .down)
             for (offset, clue) in group.children("clue").enumerated() {
-                let label = clue.attributes["number"]
+                let label = clue.attributes["number"].map(TextLimits.label)
                 let number = label.flatMap { Int($0.split(separator: "/").first ?? "") } ?? offset + 1
                 var clueCells = clue.attributes["word"].flatMap { words[$0] } ?? []
                 if clueCells.isEmpty, let start = numberToCell[number] {

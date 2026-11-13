@@ -63,13 +63,18 @@ enum XMLNode: Sendable, Hashable {
 }
 
 enum XMLTree {
+    /// Real .jpz files nest about 6 levels; deeper trees are rejected so recursion stays shallow.
+    static let maxDepth = 64
+
     static func parse(_ data: Data) throws(PuzzleFormatError) -> XMLElement {
         let builder = Builder()
         let parser = XMLParser(data: data)
         parser.delegate = builder
         parser.shouldProcessNamespaces = false
         parser.shouldResolveExternalEntities = false
-        guard parser.parse(), let root = builder.root else {
+        let parsed = parser.parse()
+        if builder.tooDeep { throw .malformed("XML is nested too deeply") }
+        guard parsed, let root = builder.root else {
             throw .malformed("invalid XML (\(parser.parserError?.localizedDescription ?? "unknown error"))")
         }
         return root
@@ -115,14 +120,21 @@ enum XMLTree {
     private final class Builder: NSObject, XMLParserDelegate {
         var stack: [XMLElement] = []
         var root: XMLElement?
+        var tooDeep = false
 
         func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?,
                     qualifiedName: String?, attributes: [String: String] = [:]) {
+            guard stack.count < XMLTree.maxDepth else {
+                tooDeep = true
+                stack.removeAll()
+                parser.abortParsing()
+                return
+            }
             stack.append(XMLElement(name: elementName, attributes: attributes))
         }
 
         func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName: String?) {
-            guard let finished = stack.popLast() else { return }
+            guard !tooDeep, let finished = stack.popLast() else { return }
             if stack.isEmpty {
                 root = finished
             } else {
@@ -139,7 +151,7 @@ enum XMLTree {
         }
 
         private func appendText(_ text: String) {
-            guard !stack.isEmpty else { return }
+            guard !tooDeep, !stack.isEmpty else { return }
             if case .text(let existing) = stack[stack.count - 1].children.last {
                 stack[stack.count - 1].children[stack[stack.count - 1].children.count - 1] = .text(existing + text)
             } else {

@@ -167,7 +167,10 @@ final class LibraryStore {
     }
 
     nonisolated static func listPuzzles(in folder: URL) -> [PuzzleItem] {
-        let keys: [URLResourceKey] = [.contentModificationDateKey, .creationDateKey, .isRegularFileKey, .ubiquitousItemDownloadingStatusKey]
+        let keys: [URLResourceKey] = [
+            .contentModificationDateKey, .creationDateKey, .isRegularFileKey, .isSymbolicLinkKey,
+            .ubiquitousItemDownloadingStatusKey,
+        ]
         guard let enumerator = FileManager.default.enumerator(
             at: folder, includingPropertiesForKeys: keys, options: [.skipsPackageDescendants]
         ) else { return [] }
@@ -189,6 +192,8 @@ final class LibraryStore {
             guard PuzzleFormat.fileExtensions.contains((name as NSString).pathExtension.lowercased()) else { continue }
 
             let values = try? url.resourceValues(forKeys: Set(keys))
+            // Only real files inside the folder: a symlink could point anywhere.
+            if values?.isSymbolicLink == true { continue }
             if let status = values?.ubiquitousItemDownloadingStatus, status == .notDownloaded { downloaded = false }
             if !downloaded { try? FileManager.default.startDownloadingUbiquitousItem(at: target) }
 

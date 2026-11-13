@@ -4,12 +4,15 @@ import Foundation
 /// against the checksum of the real solution stored in the header.
 enum PuzScrambler {
     private static let alphabet = Array("ABCDEFGHIJKLMNOPQRSTUVWXYZ".utf8)
+    /// Brute force costs 10,000 tries × the open-cell count. Real scrambled puzzles are at most
+    /// about 25×25; larger grids are left locked (no Check) rather than tying up the CPU.
+    static let maxScrambledCells = 1_000
 
     /// Returns the unscrambled solution grid, or nil when no key matches.
     static func unlock(_ file: PuzFile) -> [UInt8]? {
         let columnOrder = columnMajorOpenCells(file)
         let scrambled = columnOrder.map { file.solution[$0] }
-        guard !scrambled.isEmpty, scrambled.allSatisfy(alphabet.contains) else { return nil }
+        guard !scrambled.isEmpty, scrambled.count <= maxScrambledCells, scrambled.allSatisfy(alphabet.contains) else { return nil }
         let letters = scrambled.map { Int($0 - UInt8(ascii: "A")) }
 
         for key in 0...9999 {

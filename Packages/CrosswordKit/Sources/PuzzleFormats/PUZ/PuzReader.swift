@@ -88,21 +88,21 @@ enum PuzReader {
             let byte = file.solution[i]
             guard byte != PuzFile.blockByte, byte != PuzFile.diagramlessBlockByte else { return .block }
             let solution = rebus[i] ?? solutionLetters.map { file.decode([$0[i]]) }
-            return PuzzleCell(kind: .open, solution: solution?.uppercased(), isCircled: gext[i] & GextFlag.circled != 0)
+            return PuzzleCell(kind: .open, solution: solution.map(TextLimits.entry), isCircled: gext[i] & GextFlag.circled != 0)
         }
 
         let entries = GridNumbering.entries(width: file.width, height: file.height) { cells[$0].isOpen }
         var clues: [Clue] = []
         for (position, entry) in entries.enumerated() {
             cells[entry.cells[0]].number = entry.number
-            let text = position < file.clues.count ? file.decode(file.clues[position]) : ""
+            let text = position < file.clues.count ? file.text(file.clues[position]) : ""
             clues.append(Clue(direction: entry.direction, number: entry.number, text: text, cells: entry.cells))
         }
         let ordered = clues.filter { $0.direction == .across } + clues.filter { $0.direction == .down }
 
         let metadata = PuzzleMetadata(
-            title: file.decode(file.title), author: file.decode(file.author),
-            copyright: file.decode(file.copyright), notes: file.decode(file.notes)
+            title: file.text(file.title), author: file.text(file.author),
+            copyright: file.text(file.copyright), notes: file.text(file.notes)
         )
         let puzzle = Puzzle(width: file.width, height: file.height, cells: cells, clues: ordered, metadata: metadata)
         return (puzzle, state(from: file, cells: cells, gext: gext))
@@ -121,7 +121,7 @@ enum PuzReader {
             if flags & GextFlag.previouslyIncorrect != 0 { marks.insert(.previouslyIncorrect) }
             if flags & GextFlag.revealed != 0 { marks.insert(.revealed) }
             if flags & GextFlag.pencil != 0 { marks.insert(.pencil) }
-            return CellState(entry: entry.uppercased(), marks: marks)
+            return CellState(entry: TextLimits.entry(entry), marks: marks)
         }
         return SolveState(cells: states)
     }

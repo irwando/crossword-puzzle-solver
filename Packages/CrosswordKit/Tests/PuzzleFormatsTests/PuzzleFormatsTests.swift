@@ -182,6 +182,8 @@ struct CodecTests {
 
     @Test func markupStripping() {
         #expect(MarkupText.plain("<b>Bold</b> &amp; <i>it</i>&#233;&#x41;") == "Bold & itéA")
+        #expect(MarkupText.plain("One<br/>Two<BR>Three") == "One\nTwo\nThree")
+        #expect(MarkupText.plain("a < b") == "a < b")
     }
 
     @Test func crc32() {

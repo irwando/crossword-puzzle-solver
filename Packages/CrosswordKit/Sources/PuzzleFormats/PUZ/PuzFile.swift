@@ -49,6 +49,11 @@ struct PuzFile: Sendable, Hashable {
             ?? String(decoding: bytes, as: UTF8.self)
     }
 
+    /// Decoded display text: control characters removed, length limited.
+    func text(_ bytes: [UInt8]) -> String {
+        TextLimits.clean(decode(Array(bytes.prefix(TextLimits.maxTextLength * 4))))
+    }
+
     func encode(_ string: String) -> [UInt8] {
         Array(string.data(using: encoding, allowLossyConversion: true) ?? Data(string.utf8))
     }
