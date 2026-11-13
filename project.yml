@@ -43,5 +43,16 @@ targets:
         ENABLE_USER_SELECTED_FILES: readwrite
         "CODE_SIGN_ENTITLEMENTS[sdk=macosx*]": App/Resources/Crosswords-macOS.entitlements
         ENABLE_HARDENED_RUNTIME: YES
+    postBuildScripts:
+      - name: Copy LocalDefaults.plist (Debug)
+        basedOnDependencyAnalysis: false
+        script: |
+          # Optional, git-ignored debug defaults; see LocalDefaults.example.plist.
+          dest="${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/LocalDefaults.plist"
+          if [ "${CONFIGURATION}" = "Debug" ] && [ -f "${SRCROOT}/LocalDefaults.plist" ]; then
+            cp "${SRCROOT}/LocalDefaults.plist" "$dest"
+          else
+            rm -f "$dest"
+          fi
     scheme:
       testTargets: []

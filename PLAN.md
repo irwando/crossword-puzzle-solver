@@ -29,12 +29,17 @@ by brute-forcing the 4-digit key against the stored scramble checksum (solution 
 
 ```
 Packages/CrosswordKit/            Swift package, fully unit-tested (`swift test`)
-  CrosswordCore/                  Puzzle model, grid index, SolveSession (pure value-type engine)
+  CrosswordCore/                  Puzzle model, grid index, SolveSession (pure value-type engine),
+                                  publication-date parsing for library sorting
   PuzzleFormats/                  PUZ / IPUZ / JPZ readers + writers, checksums, unscrambler, mini XML tree, zip
 App/                              SwiftUI app (iPad + Mac)
-  Library/                        folder bookmark, file listing, progress summaries
-  Storage/                        NSFileCoordinator IO, NSFilePresenter change detection + merge
-  Puzzle/                         grid canvas, clue bar, clue lists, toolbar & menu commands, key handling
+  Library/                        folder bookmark, file listing, progress summaries, sort/filter/search
+  Storage/                        NSFileCoordinator IO, NSFilePresenter change detection + merge,
+                                  debug-only LocalDefaults.plist loader
+  Puzzle/                         grid canvas, clue bar, clue lists, wide/tall layouts, key handling
+  Commands/                       menu-bar commands (File: folder actions; Puzzle: check/reveal/pencil)
+  Settings/                       theme, fonts, clue placement, highlighting (AppStorage + environment)
+  Theme/                          palette and highlight color sets (light/dark)
   Keyboard/                       on-screen crossword keyboard
 ```
 

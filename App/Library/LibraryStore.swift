@@ -207,6 +207,12 @@ final class LibraryStore {
     private static func debugFolderOverride() -> URL? {
         #if DEBUG
         guard let path = UserDefaults.standard.string(forKey: "CrosswordsFolder") else { return nil }
+        // The sandboxed Mac app can't read arbitrary paths; fall back to the saved bookmark then.
+        guard FileManager.default.isReadableFile(atPath: path) else {
+            Logger(subsystem: "com.irwando.crosswords", category: "library")
+                .notice("Ignoring unreadable CrosswordsFolder \(path, privacy: .public)")
+            return nil
+        }
         return URL(fileURLWithPath: path, isDirectory: true)
         #else
         return nil

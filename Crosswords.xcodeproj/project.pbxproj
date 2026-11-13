@@ -13,6 +13,7 @@
 		1C8AB661025B0FDEE09BE138 /* WidePuzzleLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C6E6D5B2B75C38DD1B01A4F /* WidePuzzleLayout.swift */; };
 		30DA76FA37AAED911869F971 /* LibraryCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1EBE86D25451E95BDD2310 /* LibraryCommands.swift */; };
 		37D1D22D2A7EBB3BA04B6CA9 /* HighlightStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19724F2673464E96A750DC27 /* HighlightStyle.swift */; };
+		3BE66CF493B9E232EEF39293 /* LocalDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7CDE7E7C2782C249F28636F /* LocalDefaults.swift */; };
 		3C811C9507D0DF1D8E283F85 /* LibraryControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98B33F9FC70C16827A733D6C /* LibraryControls.swift */; };
 		5425762434A90EB404627249 /* AppNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8142B76E13B78DCB4410632F /* AppNavigation.swift */; };
 		549C555D24BBC17070836F91 /* PuzzleFormats in Frameworks */ = {isa = PBXBuildFile; productRef = 6B2545354C06A2BCCB00552E /* PuzzleFormats */; };
@@ -69,6 +70,7 @@
 		CDFA10E1DA7E303CC70F1593 /* PuzzleScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PuzzleScreen.swift; sourceTree = "<group>"; };
 		D06887EB5C426DB936255454 /* LibraryQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryQuery.swift; sourceTree = "<group>"; };
 		D0E8977A272D659B44846361 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E7CDE7E7C2782C249F28636F /* LocalDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDefaults.swift; sourceTree = "<group>"; };
 		FCB7B09988A5ECF3E10AC06E /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
 		FF062169F07D1A3FCCC11502 /* ClueViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClueViews.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -169,6 +171,7 @@
 			children = (
 				C99320D9544405194B431DB8 /* FilePresenter.swift */,
 				1D037A2538CB026E8B89E652 /* FolderBookmark.swift */,
+				E7CDE7E7C2782C249F28636F /* LocalDefaults.swift */,
 				12D5BE942101D7B659AE5AFF /* PuzzleFileIO.swift */,
 			);
 			path = Storage;
@@ -221,6 +224,7 @@
 				39A1BE8B7D27FE42679A53B1 /* Sources */,
 				11AEBE9AD18765A8FF5EE9C4 /* Resources */,
 				F2DD309A469A26018575D312 /* Frameworks */,
+				A356EA5F25F27BD468074F49 /* Copy LocalDefaults.plist (Debug) */,
 			);
 			buildRules = (
 			);
@@ -283,6 +287,28 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		A356EA5F25F27BD468074F49 /* Copy LocalDefaults.plist (Debug) */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy LocalDefaults.plist (Debug)";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Optional, git-ignored debug defaults; see LocalDefaults.example.plist.\ndest=\"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/LocalDefaults.plist\"\nif [ \"${CONFIGURATION}\" = \"Debug\" ] && [ -f \"${SRCROOT}/LocalDefaults.plist\" ]; then\n  cp \"${SRCROOT}/LocalDefaults.plist\" \"$dest\"\nelse\n  rm -f \"$dest\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		39A1BE8B7D27FE42679A53B1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -305,6 +331,7 @@
 				B33982F3893FE7FF2B9150DD /* LibraryQuery.swift in Sources */,
 				F84FAAA7763A1336EE7228CF /* LibraryStore.swift in Sources */,
 				19FD1E36EE1C166139D8B817 /* LibraryView.swift in Sources */,
+				3BE66CF493B9E232EEF39293 /* LocalDefaults.swift in Sources */,
 				FDC935057CDF2A53A5417205 /* PuzzleCommands.swift in Sources */,
 				F75959E8E307E4A5CE137261 /* PuzzleFileIO.swift in Sources */,
 				66AFF429B037A84D00CCE622 /* PuzzleScreen.swift in Sources */,

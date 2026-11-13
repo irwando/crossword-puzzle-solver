@@ -15,9 +15,42 @@ open Crosswords.xcodeproj
 ```
 
 1. Select the **Crosswords** target → *Signing & Capabilities* → choose your (personal) team.
-2. Pick **My Mac** or your iPad and run.
-   With a free Apple team, apps installed on an iPad expire after 7 days; just run from Xcode again.
+   Run `xcodegen generate` again whenever files are added; it rewrites the project, so re-pick the team
+   if Xcode asks.
+2. Pick **My Mac**, an iPad simulator, or your iPad, and run (⌘R).
 3. On first launch, choose your puzzle folder in iCloud Drive (do this once per device).
+
+### On an iPad
+
+1. Connect the iPad by cable and tap **Trust This Computer**.
+2. On the iPad, turn on **Settings → Privacy & Security → Developer Mode** (it restarts).
+3. Choose the iPad as the run destination in Xcode and press ⌘R.
+4. If iPadOS says the developer is untrusted: **Settings → General → VPN & Device Management** → trust your
+   profile.
+
+After the first install, *Window → Devices and Simulators → Connect via network* lets you install over Wi-Fi.
+With a free Apple team, the app expires after 7 days; run from Xcode again to reinstall.
+
+### In the iPad simulator
+
+Choose an iPad simulator as the run destination. The simulator can read folders on your Mac directly, so
+instead of copying puzzles in you can point it at a folder with `CrosswordsFolder` (see
+[Debug launch arguments](#debug-launch-arguments-debug-builds-only)), for example in `LocalDefaults.plist`.
+Your Mac keyboard acts as a hardware keyboard; toggle it under *I/O → Keyboard*. iCloud sync between
+devices needs real hardware.
+
+From the command line:
+
+```sh
+xcrun simctl list devices available | grep iPad          # find a simulator
+xcrun simctl launch booted com.irwando.crosswords -CrosswordsFolder "/path/to/puzzles"
+```
+
+### Finding your iCloud puzzle folder on the Mac
+
+iCloud Drive lives at `~/Library/Mobile Documents/com~apple~CloudDocs`. If *Desktop & Documents Folders*
+syncing is on, iCloud Drive › Documents is your normal `~/Documents`, so a folder that shows up as
+iCloud Drive › Documents › Puzzles is at `~/Documents/Puzzles`.
 
 Package tests (parsers, writers, solve engine):
 
@@ -78,3 +111,9 @@ Settings are per device.
 | `-CrosswordsShowKeyboard YES` | Force the on-screen keyboard |
 | `-CrosswordsDebugType <letters>` | Type into 3-Down and check it (end-to-end save test) |
 | `-CrosswordsShowSettings YES` | Open Settings at launch (iPad) |
+
+To set any of these without editing the Xcode scheme (which `xcodegen generate` resets), copy
+`LocalDefaults.example.plist` to `LocalDefaults.plist` at the project root and edit it. That file is
+git-ignored and copied into Debug builds only. Its values act as fallbacks, so launch arguments and saved
+settings still win. The Mac app is sandboxed, so on Mac a folder path only works inside the app's
+container; in the iPad simulator any path on your Mac works.

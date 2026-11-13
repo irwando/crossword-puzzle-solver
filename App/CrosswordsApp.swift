@@ -2,8 +2,13 @@ import SwiftUI
 
 @main
 struct CrosswordsApp: App {
-    @State private var library = LibraryStore()
+    @State private var library: LibraryStore
     @State private var navigation = AppNavigation()
+
+    init() {
+        LocalDefaults.register()
+        _library = State(initialValue: LibraryStore())
+    }
 
     var body: some Scene {
         WindowGroup {
